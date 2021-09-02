@@ -51,7 +51,7 @@ public class VideoController {
     }
 
     @GetMapping("/findVideoById/{id}")
-    private ResponseEntity<?> videoWithPrice(@PathVariable("id")String id) {
+    public ResponseEntity<?> videoWithPrice(@PathVariable("id")String id) {
         VideoPrice videoPrice;
         log.info("Here");
         try{
@@ -70,7 +70,7 @@ public class VideoController {
     }
 
     @GetMapping("/calculateVideoPrice")
-    private ResponseEntity<?>rentAVideo(@RequestBody CalculateVideoPriceDto calculateVideoPriceDto) {
+    public ResponseEntity<?>rentAVideo(@RequestBody CalculateVideoPriceDto calculateVideoPriceDto) {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

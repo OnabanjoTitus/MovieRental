@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
+@Service
 public interface VideoServices {
     List<VideoDto> findAllVideos();
     VideoDto addVideo(VideoDto videoDto) throws VideoException;
