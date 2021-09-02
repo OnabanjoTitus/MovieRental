@@ -49,7 +49,7 @@ public class VideoServicesImpl implements VideoServices{
         }
         Video video= new Video();
         video.setVideoGenre(videoGenreCheck(videoDto.getVideoGenre()));
-        video.setVideoTitle(videoDto.getVideoTitle().toUpperCase());
+        video.setVideoTitle(videoDto.getVideoTitle());
         video.setVideoType(videoDto.getVideoType());
         video.setVideoPrice(setVideoPrice(video.getVideoType()));
         videoRepository.save(video);
