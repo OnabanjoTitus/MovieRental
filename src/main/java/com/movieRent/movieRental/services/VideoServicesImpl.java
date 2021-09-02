@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 @Slf4j
@@ -55,6 +56,35 @@ public class VideoServicesImpl implements VideoServices{
         return videoDto;
     }
 
+    @Override
+    public VideoDtoWithPrice calculateVideoPrice(CalculateVideoPriceDto calculateVideoPriceDto) throws VideoException {
+           Video video= videoRepository.findAllByVideoTitle(calculateVideoPriceDto.getVideoSelectedTitle()).orElseThrow(()->new VideoException("There is no video with this title"));
+           Integer integer= videoTypeCheck(video.getVideoType());
+           VideoDtoWithPrice videoDtoWithPrice= new VideoDtoWithPrice();
+           videoDtoWithPrice.setPriceOfMovie(calculateVideoPriceBasedOnVideoType(integer,video.getVideoType(),calculateVideoPriceDto.getNumberOfDays()));
+           videoDtoWithPrice.setUserName(calculateVideoPriceDto.getUserName());
+           videoDtoWithPrice.setNumberOfDays(calculateVideoPriceDto.getNumberOfDays());
+           videoDtoWithPrice.setVideoSelected(calculateVideoPriceDto.getVideoSelectedTitle());
+
+           return videoDtoWithPrice;
+    }
+
+    private Double calculateVideoPriceBasedOnVideoType(Integer integer, String videoType,Integer numberOfDays) {
+        log.info("Calculator-->{}{}",videoType,integer);
+        videoType=videoType.toLowerCase();
+        String[] types=videoType.split(":");
+        log.info("Calculator2-->{}{}",videoType,integer);
+        switch (types[0]){
+            case "regular":
+                return 10.0*numberOfDays;
+            case "children's movie":
+                return 8.0*numberOfDays+(integer/2.0);
+            case "new release":
+                return 15.0*numberOfDays-(integer/2.0);
+        }
+        return null;
+    }
+
     private Genre videoGenreCheck(String videoGenre) {
         if(videoGenre.equalsIgnoreCase("Action")){
             return Genre.Action;
@@ -73,19 +103,25 @@ public class VideoServicesImpl implements VideoServices{
         }
         return null;
     }
-//
-//    private String videoTypeCheck(String videoType) {
-//        String type=videoType.toString();
-//        String[] types=type.split(":");
-//        switch (types[0]){
-//            case "Regular":
-//                return "Regular";
-//            case "Children's Movie":
-//                return new ChildrenMovie(types[1]);
-//            case "New Release":
-//                LocalDate date = LocalDate.parse(types[1]);
-//                return new NewRelease(date);
-//        }
-//        return null;
-//    }
+
+    private Integer videoTypeCheck(String videoType) {
+        String type= videoType;
+        String check=type;
+        String type2="";
+        if(!type.equalsIgnoreCase("regular")){
+        String[] types=type.split(":");
+        type2=types[1];
+        check=types[0];
+        log.info("The price na-->{}",types[1]);
+        }
+
+        switch (check){
+            case "Regular":
+                return 0;
+            case "Children's Movie":
+            case "New Release":
+                return Integer.valueOf(type2.trim());
+        }
+        return null;
+    }
 }
