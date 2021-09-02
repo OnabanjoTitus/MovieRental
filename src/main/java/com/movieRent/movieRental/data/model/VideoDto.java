@@ -9,6 +9,6 @@ import javax.persistence.Id;
 @Data
 public class VideoDto {
     private String videoTitle;
-    private Object videoType;
-    private Genre videoGenre;
+    private String videoType;
+    private String videoGenre;
 }

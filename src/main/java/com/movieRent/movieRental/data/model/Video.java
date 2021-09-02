@@ -13,12 +13,12 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class Video {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String videoId;
-    @Column(nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer videoId;
+    @Column
     private String videoTitle;
-    @Column(nullable = false)
-    private Object videoType;
-    @Column(nullable = false)
+    @Column
+    private String videoType;
+    @Column
     private Genre videoGenre;
 }
