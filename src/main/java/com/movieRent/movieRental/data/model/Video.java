@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 
@@ -11,7 +12,7 @@ import javax.persistence.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Video {
+public class Video  {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer videoId;
@@ -21,4 +22,6 @@ public class Video {
     private String videoType;
     @Column
     private Genre videoGenre;
+    @Column
+    private Double videoPrice;
 }

@@ -4,9 +4,9 @@ import lombok.Data;
 import org.springframework.hateoas.RepresentationModel;
 
 @Data
-public class VideoDto extends RepresentationModel<VideoDto> {
+public class VideoPrice extends RepresentationModel<VideoPrice> {
     private String videoTitle;
     private String videoType;
     private String videoGenre;
-
+    private Double videoPrice;
 }

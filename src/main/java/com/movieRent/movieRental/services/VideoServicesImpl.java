@@ -5,16 +5,12 @@ import com.movieRent.movieRental.data.repository.VideoRepository;
 import com.movieRent.movieRental.web.Exception.VideoException;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 @Slf4j
@@ -52,21 +48,52 @@ public class VideoServicesImpl implements VideoServices{
         video.setVideoGenre(videoGenreCheck(videoDto.getVideoGenre()));
         video.setVideoTitle(videoDto.getVideoTitle());
         video.setVideoType(videoDto.getVideoType());
+        video.setVideoPrice(setVideoPrice(video.getVideoType()));
         videoRepository.save(video);
         return videoDto;
     }
 
-    @Override
-    public VideoDtoWithPrice calculateVideoPrice(CalculateVideoPriceDto calculateVideoPriceDto) throws VideoException {
-           Video video= videoRepository.findAllByVideoTitle(calculateVideoPriceDto.getVideoSelectedTitle()).orElseThrow(()->new VideoException("There is no video with this title"));
-           Integer integer= videoTypeCheck(video.getVideoType());
-           VideoDtoWithPrice videoDtoWithPrice= new VideoDtoWithPrice();
-           videoDtoWithPrice.setPriceOfMovie(calculateVideoPriceBasedOnVideoType(integer,video.getVideoType(),calculateVideoPriceDto.getNumberOfDays()));
-           videoDtoWithPrice.setUserName(calculateVideoPriceDto.getUserName());
-           videoDtoWithPrice.setNumberOfDays(calculateVideoPriceDto.getNumberOfDays());
-           videoDtoWithPrice.setVideoSelected(calculateVideoPriceDto.getVideoSelectedTitle());
+    private Double setVideoPrice(String videoType) {
+        videoType=videoType.toLowerCase();
+        String[] types=videoType.split(":");
+        switch (types[0]){
+            case "regular":
+                return 10.0;
+            case "children's movie":
+                return 8.0;
+            case "new release":
+                return 15.0;
+        }
+        return null;
 
-           return videoDtoWithPrice;
+    }
+
+    @Override
+    public VideoDtoWithPriceAndUsername calculateVideoPrice(CalculateVideoPriceDto calculateVideoPriceDto) throws VideoException {
+        Pageable firstPageWithTwoElements = PageRequest.of(0, findAllVideos().size());
+        Page<Video> videoList=videoRepository.findAll(firstPageWithTwoElements);
+        Video video=videoList
+                .stream().filter(videos ->videos.getVideoTitle().equalsIgnoreCase(calculateVideoPriceDto.getVideoSelectedTitle())).findFirst().orElseThrow(()->new VideoException("Video with this title not found"));
+            Integer integer= videoTypeCheck(video.getVideoType());
+            VideoDtoWithPriceAndUsername videoDtoWithPriceAndUsername = new VideoDtoWithPriceAndUsername();
+            videoDtoWithPriceAndUsername.setPriceOfMovie(calculateVideoPriceBasedOnVideoType(integer,video.getVideoType(),calculateVideoPriceDto.getNumberOfDays()));
+            videoDtoWithPriceAndUsername.setUserName(calculateVideoPriceDto.getUserName());
+            videoDtoWithPriceAndUsername.setNumberOfDays(calculateVideoPriceDto.getNumberOfDays());
+            videoDtoWithPriceAndUsername.setVideoSelected(calculateVideoPriceDto.getVideoSelectedTitle());
+
+           return videoDtoWithPriceAndUsername;
+    }
+
+    @Override
+    public VideoPrice findVideoByTitle(String videoTitle) throws VideoException {
+        Pageable firstPageWithTwoElements = PageRequest.of(0, findAllVideos().size());
+        Page<Video> videoList=videoRepository.findAll(firstPageWithTwoElements);
+        Video videoFound=videoList
+                .stream().filter(video ->video.getVideoTitle().equalsIgnoreCase(videoTitle)).findFirst().orElseThrow(()->new VideoException("Video with this title not found"));
+        VideoPrice videoDto= new VideoPrice();
+
+        modelMapper.map(videoFound,videoDto);
+        return videoDto;
     }
 
     private Double calculateVideoPriceBasedOnVideoType(Integer integer, String videoType,Integer numberOfDays) {
@@ -80,7 +107,7 @@ public class VideoServicesImpl implements VideoServices{
             case "children's movie":
                 return 8.0*numberOfDays+(integer/2.0);
             case "new release":
-                return 15.0*numberOfDays-(integer/2.0);
+                return 15.0*numberOfDays-(integer);
         }
         return null;
     }
