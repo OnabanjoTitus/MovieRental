@@ -38,20 +38,37 @@ public class VideoServicesImpl implements VideoServices{
         if(videoDto.getVideoGenre()==null|| videoDto.getVideoGenre().toString().equals("")){
             throw new VideoException("Video Genre cannot be null");
         }
-        if(videoDto.getVideoType().equals("") ||videoDto.getVideoType()==null){
+        if( videoDto.getVideoType().isEmpty()||videoDto.getVideoType().isBlank()||videoDto.getVideoType()==null){
             throw new VideoException("Video Type cannot be empty");
         }
         if(videoDto.getVideoTitle()==null|| videoDto.getVideoTitle().equals("")){
             throw new VideoException("Video Name cannot be empty");
         }
+        if(notAType(videoDto.getVideoType())){
+            throw new VideoException("Video Type is Invalid");
+        }
         Video video= new Video();
         video.setVideoGenre(videoGenreCheck(videoDto.getVideoGenre()));
-        video.setVideoTitle(videoDto.getVideoTitle());
+        video.setVideoTitle(videoDto.getVideoTitle().toUpperCase());
         video.setVideoType(videoDto.getVideoType());
         video.setVideoPrice(setVideoPrice(video.getVideoType()));
         videoRepository.save(video);
         return videoDto;
     }
+
+    private boolean notAType(String videoType) {
+        String type= videoType;
+        String check=type;
+        if(videoType.contains(":")){
+                String[] types=type.split(":");
+                check=types[0].trim();
+        }
+        if(check.equalsIgnoreCase("regular")||check.equalsIgnoreCase("children'smovie")||check.equalsIgnoreCase("newrelease")){
+            return false;
+        }
+        return true;
+    }
+
 
     private Double setVideoPrice(String videoType) {
         videoType=videoType.toLowerCase();
@@ -70,6 +87,12 @@ public class VideoServicesImpl implements VideoServices{
 
     @Override
     public VideoDtoWithPriceAndUsername calculateVideoPrice(CalculateVideoPriceDto calculateVideoPriceDto) throws VideoException {
+        if(calculateVideoPriceDto.getNumberOfDays()<1){
+            throw new VideoException("Number of days is invalid");
+        }
+        if(calculateVideoPriceDto.getUserName()==null||calculateVideoPriceDto.getUserName().isEmpty()||calculateVideoPriceDto.getUserName().isBlank()){
+            throw new VideoException("UserName cannot be empty");
+        }
         Pageable firstPageWithTwoElements = PageRequest.of(0, findAllVideos().size());
         Page<Video> videoList=videoRepository.findAll(firstPageWithTwoElements);
         Video video=videoList
@@ -140,7 +163,6 @@ public class VideoServicesImpl implements VideoServices{
         String[] types=type.split(":");
         type2=types[1];
         check=types[0];
-        log.info("The price na-->{}",types[1]);
         }
 
         switch (check){
