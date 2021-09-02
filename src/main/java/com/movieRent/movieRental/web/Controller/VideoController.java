@@ -1,9 +1,6 @@
 package com.movieRent.movieRental.web.Controller;
 
-import com.movieRent.movieRental.data.model.CalculateVideoPriceDto;
-import com.movieRent.movieRental.data.model.Video;
-import com.movieRent.movieRental.data.model.VideoDto;
-import com.movieRent.movieRental.data.model.VideoPrice;
+import com.movieRent.movieRental.data.model.*;
 import com.movieRent.movieRental.services.VideoServices;
 import com.movieRent.movieRental.web.Exception.VideoException;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +42,7 @@ public class VideoController {
         List<VideoDto> video=videoServices.findAllVideos()
                 .stream()
                 .map(videoDto-> videoDto.add(
-                        linkTo(methodOn(VideoController.class).videoWithPrice(videoDto.getVideoTitle())).withSelfRel(),
+                        linkTo(methodOn(VideoController.class).videoWithPrice(videoDto.getVideoTitle())).withRel("View Movie info"),
                         linkTo(methodOn(VideoController.class).findAllMovie()).withSelfRel())).collect(Collectors.toList());
         return new ResponseEntity<>(video, HttpStatus.OK);
     }
@@ -53,10 +50,9 @@ public class VideoController {
     @GetMapping("/findVideoById/{id}")
     public ResponseEntity<?> videoWithPrice(@PathVariable("id")String id) {
         VideoPrice videoPrice;
-        log.info("Here");
+
         try{
             videoPrice=videoServices.findVideoByTitle(id);
-            log.info("The video found is-->{}",videoPrice);
             EntityModel<VideoPrice> videoDtoEntity=EntityModel.of(
                     videoPrice,linkTo(methodOn(VideoController.class).
                             findAllMovie()).withRel("All Movies"));
@@ -71,7 +67,18 @@ public class VideoController {
 
     @GetMapping("/calculateVideoPrice")
     public ResponseEntity<?>rentAVideo(@RequestBody CalculateVideoPriceDto calculateVideoPriceDto) {
-        return new ResponseEntity<>(HttpStatus.OK);
+        VideoDtoWithPriceAndUsername videoDtoWithPriceAndUsername;
+
+        try{
+           videoDtoWithPriceAndUsername= videoServices.calculateVideoPrice(calculateVideoPriceDto);
+
+        }
+        catch (VideoException videoException){
+            return new ResponseEntity<>(videoException.getMessage(),HttpStatus.BAD_REQUEST);
+
+        }
+
+        return new ResponseEntity<>(videoDtoWithPriceAndUsername,HttpStatus.OK);
     }
 
 }

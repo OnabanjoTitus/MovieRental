@@ -42,7 +42,7 @@ public class VideoServicesImpl implements VideoServices{
             throw new VideoException("Video Type cannot be empty");
         }
         if(videoDto.getVideoTitle()==null|| videoDto.getVideoTitle().equals("")){
-            throw new VideoException("Video Genre cannot be empty");
+            throw new VideoException("Video Name cannot be empty");
         }
         Video video= new Video();
         video.setVideoGenre(videoGenreCheck(videoDto.getVideoGenre()));
@@ -76,10 +76,11 @@ public class VideoServicesImpl implements VideoServices{
                 .stream().filter(videos ->videos.getVideoTitle().equalsIgnoreCase(calculateVideoPriceDto.getVideoSelectedTitle())).findFirst().orElseThrow(()->new VideoException("Video with this title not found"));
             Integer integer= videoTypeCheck(video.getVideoType());
             VideoDtoWithPriceAndUsername videoDtoWithPriceAndUsername = new VideoDtoWithPriceAndUsername();
-            videoDtoWithPriceAndUsername.setPriceOfMovie(calculateVideoPriceBasedOnVideoType(integer,video.getVideoType(),calculateVideoPriceDto.getNumberOfDays()));
+            modelMapper.map(video,videoDtoWithPriceAndUsername);
             videoDtoWithPriceAndUsername.setUserName(calculateVideoPriceDto.getUserName());
             videoDtoWithPriceAndUsername.setNumberOfDays(calculateVideoPriceDto.getNumberOfDays());
             videoDtoWithPriceAndUsername.setVideoSelected(calculateVideoPriceDto.getVideoSelectedTitle());
+            videoDtoWithPriceAndUsername.setPriceOfMovie(calculateVideoPriceBasedOnVideoType(integer,video.getVideoType(),calculateVideoPriceDto.getNumberOfDays()));
 
            return videoDtoWithPriceAndUsername;
     }

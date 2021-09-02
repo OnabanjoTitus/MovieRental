@@ -102,6 +102,7 @@ class VideoServicesImplTest {
         List<VideoDto>videoDtoList=videoServices.findAllVideos();
         log.info("The list of vid in th db are -->{}",videoDtoList);
        VideoPrice videoDtoP=videoServices.findVideoByTitle("Jackie");
+
        assertEquals(videoDtoP.getVideoTitle(),videoDto.getVideoTitle());
     }
 
