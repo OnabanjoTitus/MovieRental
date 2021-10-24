@@ -14,6 +14,5 @@ public interface VideoServices {
     List<VideoDto> findAllVideos();
     VideoDto addVideo(VideoDto videoDto) throws VideoException;
     VideoDtoWithPriceAndUsername calculateVideoPrice(CalculateVideoPriceDto calculateVideoPriceDto) throws VideoException;
-
     VideoPrice findVideoByTitle(String videoId) throws VideoException;
 }

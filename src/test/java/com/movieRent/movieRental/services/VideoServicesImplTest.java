@@ -8,7 +8,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,6 +38,7 @@ class VideoServicesImplTest {
         videoDto=null;
     }
     @Test
+    @Transactional
     void testThatWeCanSaveAVideoToDB() throws VideoException {
         videoDto.setVideoGenre("Action");
         videoDto.setVideoTitle("Jackie");
@@ -105,6 +110,8 @@ class VideoServicesImplTest {
 
        assertEquals(videoDtoP.getVideoTitle(),videoDto.getVideoTitle());
     }
+
+
 
 
 }

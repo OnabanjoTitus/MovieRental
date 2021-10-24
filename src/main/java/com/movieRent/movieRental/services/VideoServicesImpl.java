@@ -63,7 +63,7 @@ public class VideoServicesImpl implements VideoServices{
                 String[] types=type.split(":");
                 check=types[0].trim();
         }
-        if(check.equalsIgnoreCase("regular")||check.equalsIgnoreCase("children'smovie")||check.equalsIgnoreCase("newrelease")){
+        if(check.equalsIgnoreCase("regular")||check.equalsIgnoreCase("children's movie")||check.equalsIgnoreCase("new release")){
             return false;
         }
         return true;

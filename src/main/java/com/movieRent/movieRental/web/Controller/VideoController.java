@@ -43,7 +43,8 @@ public class VideoController {
                 .stream()
                 .map(videoDto-> videoDto.add(
                         linkTo(methodOn(VideoController.class).videoWithPrice(videoDto.getVideoTitle())).withRel("View Movie info"),
-                        linkTo(methodOn(VideoController.class).findAllMovie()).withSelfRel())).collect(Collectors.toList());
+                        linkTo(methodOn(VideoController.class).findAllMovie()).withSelfRel()
+                )).collect(Collectors.toList());
         return new ResponseEntity<>(video, HttpStatus.OK);
     }
 

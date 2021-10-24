@@ -1,0 +1,2 @@
+-- INSERT INTO video(video_id, video_title, video_type, video_genre, video_price)
+-- VALUES(1, 'Spectre', 'Regular', 1, 10);
